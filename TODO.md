@@ -1,0 +1,16 @@
+- [x] Implement GET /api/vault to fetch vault items for authenticated user
+- [x] Implement POST /api/vault to create new vault item
+- [x] Implement PUT /api/vault/[id] to update existing vault item
+- [x] Implement DELETE /api/vault/[id] to delete vault item
+- [x] Implement 2FA (TOTP) authentication
+- [x] Add tags and folders support to vault items
+- [x] Implement dark mode toggle with system preference detection
+- [x] Implement export/import functionality for vault data
+- [x] Update all UI components to support dark mode
+- [ ] Add unit tests for critical functions
+- [ ] Add end-to-end tests for authentication and vault operations
+- [ ] Add documentation for API endpoints
+- [ ] Add rate limiting to API endpoints
+- [ ] Add password strength validation
+- [ ] Add password history tracking
+- [ ] Add bulk operations for vault items
