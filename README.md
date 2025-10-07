@@ -37,6 +37,9 @@ Check out the live application: [https://password-vault-hazel.vercel.app/](https
   - JWT-based authentication with HTTP-only cookies
   - Secure session management
 
+## Screenshots
+<table> <tr> <td align="center"> <a href="https://drive.google.com/file/d/1EBdT4cTp-jDOcaMPQcucIRpB4XulLAKL/view?usp=sharing" target="_blank"> <img src="https://drive.google.com/uc?export=view&id=1EBdT4cTp-jDOcaMPQcucIRpB4XulLAKL" width="450"/> </a> <br/> Add Password </td> <td align="center"> <a href="https://drive.google.com/file/d/1RwtFn2omvkdzb6mhZzWr07REqmTzu8i5/view?usp=sharing" target="_blank"> <img src="https://drive.google.com/uc?export=view&id=1RwtFn2omvkdzb6mhZzWr07REqmTzu8i5" width="450"/> </a> <br/>Enable @FA(OTOTP) </td> </tr> </table>
+
 ## Quick Start
 
 1. Install dependencies:
