@@ -48,9 +48,9 @@ export async function getUserFromToken(): Promise<DecodedToken | null> {
 }
 
 // TOTP Functions
-export function generateTOTPSecret(): { secret: string; otpauthUrl: string } {
+export function generateTOTPSecret(email?: string): { secret: string; otpauthUrl: string } {
   const secret = speakeasy.generateSecret({
-    name: 'Password Vault',
+    name: email ? `Password Vault (${email})` : 'Password Vault',
     issuer: 'Password Vault App'
   });
 
@@ -77,4 +77,3 @@ export async function generateQRCode(otpauthUrl: string): Promise<string> {
     throw new Error('Failed to generate QR code');
   }
 }
-

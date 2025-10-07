@@ -1,4 +1,4 @@
-import { MongoClient, Db } from 'mongodb';
+import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
@@ -6,19 +6,38 @@ if (!MONGODB_URI) {
   throw new Error('Please define MONGODB_URI in .env.local');
 }
 
-let cachedClient: MongoClient | null = null;
-let cachedDb: Db | null = null;
+let cached = (global as any).mongoose;
 
-export async function connectToDatabase() {
-  if (cachedClient && cachedDb) {
-    return { client: cachedClient, db: cachedDb };
+if (!cached) {
+  cached = (global as any).mongoose = { conn: null, promise: null };
+}
+
+async function connectToDatabase() {
+  if (cached.conn) {
+    const conn = cached.conn;
+    return { conn, db: (conn as any).connection?.db };
   }
 
-  const client = await MongoClient.connect(MONGODB_URI);
-  const db = client.db('passwordvault');
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+    };
 
-  cachedClient = client;
-  cachedDb = db;
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
+      return m;
+    });
+  }
 
-  return { client, db };
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
+  const conn = cached.conn;
+  return { conn, db: (conn as any).connection?.db };
 }
+
+export { connectToDatabase };
+export default connectToDatabase;

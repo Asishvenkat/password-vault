@@ -8,6 +8,8 @@ export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [totpCode, setTotpCode] = useState('');
+  const [requires2FA, setRequires2FA] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -18,17 +20,28 @@ export default function AuthForm() {
     setLoading(true);
 
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
+      // Use the new API routes: /api/register or /api/login
+      const endpoint = isLogin ? '/api/login' : '/api/register';
+      const body = requires2FA
+        ? { email, password, totpCode }
+        : { email, password };
+
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify(body)
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Something went wrong');
+        if (data.requires2FA) {
+          setRequires2FA(true);
+          setError('Enter your 2FA code to continue');
+          setLoading(false);
+          return;
+        }
+        setError(data.message || 'Something went wrong');
         setLoading(false);
         return;
       }
@@ -36,12 +49,23 @@ export default function AuthForm() {
       // Store encryption key in sessionStorage (client-side only)
       sessionStorage.setItem('encryptionKey', password);
 
+      // Reset 2FA state
+      setRequires2FA(false);
+      setTotpCode('');
+
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (err) {
       setError('Network error. Please try again.');
       setLoading(false);
     }
+  };
+
+  const handleModeSwitch = () => {
+    setIsLogin(!isLogin);
+    setError('');
+    setRequires2FA(false);
+    setTotpCode('');
   };
 
   return (
@@ -97,25 +121,42 @@ export default function AuthForm() {
             )}
           </div>
 
+          {requires2FA && (
+            <div>
+              <label htmlFor="totpCode" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                2FA Code
+              </label>
+              <input
+                id="totpCode"
+                type="text"
+                value={totpCode}
+                onChange={(e) => setTotpCode(e.target.value)}
+                className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                required
+                placeholder="Enter 6-digit code"
+                disabled={loading}
+              />
+            </div>
+          )}
+
           <button
             type="submit"
-            disabled={loading || !email || !password}
+            disabled={loading || !email || !password || (requires2FA && !totpCode)}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition font-medium"
           >
-            {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
+            {loading ? 'Processing...' : (requires2FA ? 'Verify & Login' : (isLogin ? 'Login' : 'Sign Up'))}
           </button>
         </form>
 
-        <button
-          onClick={() => {
-            setIsLogin(!isLogin);
-            setError('');
-          }}
-          disabled={loading}
-          className="w-full mt-4 text-sm text-blue-600 dark:text-blue-400 hover:underline disabled:text-gray-400 dark:disabled:text-gray-500"
-        >
-          {isLogin ? 'Need an account? Sign up' : 'Have an account? Login'}
-        </button>
+        {!requires2FA && (
+          <button
+            onClick={handleModeSwitch}
+            disabled={loading}
+            className="w-full mt-4 text-sm text-blue-600 dark:text-blue-400 hover:underline disabled:text-gray-400 dark:disabled:text-gray-500"
+          >
+            {isLogin ? 'Need an account? Sign up' : 'Have an account? Login'}
+          </button>
+        )}
       </div>
     </div>
   );

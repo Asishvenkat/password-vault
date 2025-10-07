@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db';
+import connectToDatabase from '@/lib/db';
+import User from '@/models/User';
 import { hashPassword, createToken, generateTOTPSecret, generateQRCode } from '@/lib/auth';
 
 export async function POST(req: Request) {
   try {
+    await connectToDatabase();
+
     const body = await req.json();
     const { email, password } = body;
 
@@ -11,10 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Invalid input' }, { status: 400 });
     }
 
-    const { db } = await connectToDatabase();
-    const users = db.collection('users');
-
-    const existing = await users.findOne({ email });
+    const existing = await User.findOne({ email });
     if (existing) {
       return NextResponse.json({ message: 'User already exists' }, { status: 409 });
     }
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const { secret, otpauthUrl } = generateTOTPSecret();
     const qrCode = await generateQRCode(otpauthUrl);
 
-    const result = await users.insertOne({
+    const user = await User.create({
       email,
       password: hashed,
       totpSecret: secret,
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       createdAt: new Date()
     });
 
-    const token = createToken(result.insertedId.toString(), email);
+    const token = createToken(user._id.toString(), email);
 
     const res = NextResponse.json({
       message: 'ok',

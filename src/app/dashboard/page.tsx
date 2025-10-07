@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Key, Search, Plus, LogOut } from 'lucide-react';
+import { Key, Search, Plus, LogOut, Shield, ShieldCheck, ShieldOff } from 'lucide-react';
 import PasswordGenerator from '@/components/PasswordGenerator';
 import VaultItem from '@/components/VaultItem';
 import VaultForm from '@/components/VaultForm';
@@ -19,6 +19,11 @@ export default function Dashboard() {
   const [editingItem, setEditingItem] = useState<any>(null);
   const [encryptionKey, setEncryptionKey] = useState('');
   const [loading, setLoading] = useState(true);
+  const [show2FASetup, setShow2FASetup] = useState(false);
+  const [twoFASecret, setTwoFASecret] = useState('');
+  const [twoFAQrCode, setTwoFAQrCode] = useState('');
+  const [twoFACode, setTwoFACode] = useState('');
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
 
   useEffect(() => {
     // Get encryption key from sessionStorage
@@ -29,6 +34,7 @@ export default function Dashboard() {
     }
     setEncryptionKey(key);
     fetchVaultItems();
+    fetch2FAStatus();
   }, [router]);
 
   const fetchVaultItems = async () => {
@@ -47,6 +53,22 @@ export default function Dashboard() {
       console.error('Fetch error:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetch2FAStatus = async () => {
+    try {
+      const res = await fetch('/api/auth/2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'status' })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setIs2FAEnabled(data.enabled);
+      }
+    } catch (error) {
+      console.error('2FA status error:', error);
     }
   };
 
@@ -123,6 +145,64 @@ export default function Dashboard() {
     }
   };
 
+  const handle2FASetup = async () => {
+    try {
+      const res = await fetch('/api/auth/2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'setup' })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setTwoFASecret(data.secret);
+      setTwoFAQrCode(data.qrCode);
+      setShow2FASetup(true);
+    } catch (error) {
+      console.error('2FA setup error:', error);
+      alert('Failed to start 2FA setup');
+    }
+  };
+
+  const handle2FAConfirm = async () => {
+    try {
+      const res = await fetch('/api/auth/2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'confirm', totpCode: twoFACode, secret: twoFASecret })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setIs2FAEnabled(true);
+      setShow2FASetup(false);
+      setTwoFASecret('');
+      setTwoFAQrCode('');
+      setTwoFACode('');
+      alert('2FA enabled successfully');
+    } catch (error) {
+      console.error('2FA confirm error:', error);
+      alert('Invalid code. Please try again.');
+    }
+  };
+
+  const handle2FAToggle = async () => {
+    const action = is2FAEnabled ? 'disable' : 'enable';
+    try {
+      const res = await fetch('/api/auth/2fa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, totpCode: twoFACode })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      setIs2FAEnabled(!is2FAEnabled);
+      setTwoFACode('');
+      alert(`2FA ${action}d successfully`);
+    } catch (error) {
+      console.error('2FA toggle error:', error);
+      alert('Failed to toggle 2FA');
+    }
+  };
+
   const filteredItems = (Array.isArray(vaultItems) ? vaultItems : []).filter(item => {
     const title = (item?.title || '').toString();
     const username = (item?.username || '').toString();
@@ -186,6 +266,105 @@ export default function Dashboard() {
             />
 
             <ExportImport encryptionKey={encryptionKey} />
+
+            {/* 2FA Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3 mb-4">
+                {is2FAEnabled ? (
+                  <ShieldCheck className="w-6 h-6 text-green-600 dark:text-green-400" />
+                ) : (
+                  <ShieldOff className="w-6 h-6 text-gray-400 dark:text-gray-500" />
+                )}
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                  Two-Factor Authentication
+                </h3>
+              </div>
+
+              {show2FASetup ? (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Scan the QR code with your authenticator app, then enter the 6-digit code below.
+                  </p>
+                  <div className="flex justify-center">
+                    <img src={twoFAQrCode} alt="2FA QR Code" className="w-48 h-48" />
+                  </div>
+                  <div>
+                    <label htmlFor="twofa-code" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                      6-Digit Code
+                    </label>
+                    <input
+                      id="twofa-code"
+                      type="text"
+                      value={twoFACode}
+                      onChange={(e) => setTwoFACode(e.target.value)}
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      placeholder="Enter code"
+                      maxLength={6}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handle2FAConfirm}
+                      disabled={!twoFACode}
+                      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition font-medium"
+                    >
+                      Enable 2FA
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShow2FASetup(false);
+                        setTwoFASecret('');
+                        setTwoFAQrCode('');
+                        setTwoFACode('');
+                      }}
+                      className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition font-medium"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {is2FAEnabled
+                      ? 'Two-factor authentication is enabled for your account.'
+                      : 'Add an extra layer of security by enabling two-factor authentication.'}
+                  </p>
+                  {is2FAEnabled ? (
+                    <div className="space-y-2">
+                      <div>
+                        <label htmlFor="disable-code" className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                          Enter 6-digit code to disable
+                        </label>
+                        <input
+                          id="disable-code"
+                          type="text"
+                          value={twoFACode}
+                          onChange={(e) => setTwoFACode(e.target.value)}
+                          className="w-full border border-gray-300 dark:border-gray-600 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                          placeholder="Enter code"
+                          maxLength={6}
+                        />
+                      </div>
+                      <button
+                        onClick={handle2FAToggle}
+                        disabled={!twoFACode}
+                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition font-medium"
+                      >
+                        Disable 2FA
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handle2FASetup}
+                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition font-medium"
+                    >
+                      Set Up 2FA
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
 
             {generatedPassword && showForm && !editingItem && (
               <div className="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-lg p-4 mb-6">

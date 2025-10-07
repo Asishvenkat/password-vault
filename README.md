@@ -25,112 +25,46 @@ A modern, full-stack password manager built with Next.js 14, TypeScript, MongoDB
 - 🛡️ **Security**
 	- Passwords encrypted before leaving browser
 	- JWT-based authentication with HTTP-only cookies
-	- bcrypt password hashing
-	- Zero-trust architecture
-
-## 🛠️ Tech Stack
-
-- **Frontend**: Next.js 14 (App Router), React 18, TypeScript
-- **Styling**: Tailwind CSS
-- **Backend**: Next.js API Routes
-- **Database**: MongoDB Atlas
-- **Encryption**: crypto-js (AES-256)
-- **Authentication**: JWT + bcrypt
-- **Icons**: Lucide React
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+ installed
-- MongoDB Atlas account (free tier)
-
-### 1. Clone & Install
-
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd password-vault
-
-# Install dependencies
-npm install
-```
-
-### 2. MongoDB Setup
-
-1. Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
-2. Create a free cluster
-3. **Database Access** → Add Database User
-	 - Username: `your_username`
-	 - Password: `your_password`
-4. **Network Access** → Add IP Address
-	 - Allow access from: `0.0.0.0/0` (for development)
-5. **Connect** → Get connection string
-
-### 3. Environment Variables
-
-Create `.env.local` in the root directory:
-
-```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/passwordvault
-JWT_SECRET=your-super-secret-jwt-key-at-least-32-characters-long
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
 **Important**: 
-- Replace `username` and `password` with your MongoDB credentials
-- Generate a strong JWT_SECRET (minimum 32 characters)
+	# Password Vault - Secure Password Manager
 
-### 4. Validate Setup
+	A modern password manager built with Next.js 14, TypeScript, and MongoDB.
 
-```bash
-# Validate environment variables
-npm run validate:env
+	This repository provides a starting point: client-side encryption helpers, API routes for auth and vault CRUD, and a simple UI.
 
-# Test database connection
-npm run test:db
-```
+	## Quick start
 
-### 5. Run Development Server
+	1. Install dependencies:
 
-```bash
-npm run dev
-```
+	```bash
+	npm install
+	```
 
-Open [http://localhost:3000](http://localhost:3000)
+	2. Create `.env.local` with:
 
-### 6. (Optional) Seed Sample Data
+	```env
+	MONGODB_URI=your-mongodb-connection-string
+	JWT_SECRET=your-jwt-secret-at-least-32-chars
+	NEXT_PUBLIC_APP_URL=http://localhost:3000
+	```
 
-```bash
-npm run seed
-```
+	3. Run dev server:
 
-This creates a demo user:
-- Email: `demo@example.com`
-- Password: `DemoPassword123!`
+	```bash
+	npm run dev
+	```
 
-## 📁 Project Structure
+	4. Run smoke-test (basic API check):
 
-```
-password-vault/
-├── src/
-│   ├── app/
-│   │   ├── api/              # API Routes
-│   │   │   ├── auth/         # Authentication endpoints
-│   │   │   └── vault/        # Vault CRUD endpoints
-│   │   ├── dashboard/        # Protected dashboard page
-│   │   ├── layout.tsx        # Root layout
-│   │   ├── page.tsx          # Auth page (login/signup)
-│   │   └── globals.css       # Global styles
-│   ├── components/           # React components
-│   ├── lib/                  # Utilities (crypto, db, auth)
-│   ├── types/                # TypeScript types
-│   └── middleware.ts         # Route protection
-├── scripts/                  # Utility scripts
-├── .env.local               # Environment variables
-└── package.json
-```
+	```bash
+	npm run smoke-test
+	```
 
-## 🔐 Security & Encryption
+	## Smoke test
 
-/* README truncated in file for brevity; full README kept in repository */
-*/
+	`scripts/api-smoke-test.js` performs a simple signup/login against the running dev server.
+
+	## Notes
+
+	- API implementations are basic and intended for development. Review security before production use.
+	- If you see DNS errors connecting to MongoDB Atlas, verify `MONGODB_URI` and that your machine/network can resolve SRV records.

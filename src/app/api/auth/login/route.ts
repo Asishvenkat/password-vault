@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/db';
+import connectToDatabase from '@/lib/db';
+import User from '@/models/User';
 import { verifyPassword, createToken, verifyTOTPCode } from '@/lib/auth';
 
 export async function POST(req: Request) {
   try {
+    await connectToDatabase();
+
     const body = await req.json();
     const { email, password, totpCode } = body;
 
@@ -11,10 +14,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: 'Invalid input' }, { status: 400 });
     }
 
-    const { db } = await connectToDatabase();
-    const users = db.collection('users');
-
-    const user = await users.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }

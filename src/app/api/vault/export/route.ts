@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const exportData = {
       version: '1.0',
       exportedAt: new Date().toISOString(),
-      items: vaultItems.map(item => ({
+      items: vaultItems.map((item: any) => ({
         ...item,
         _id: undefined, // Remove MongoDB ObjectId
         userId: undefined, // Remove user ID for privacy
