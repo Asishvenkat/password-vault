@@ -1,38 +1,38 @@
-# 🔐 Password Vault - Secure Password Manager
+#  Password Vault - Secure Password Manager
 
 A modern, full-stack password manager built with Next.js 14, TypeScript, MongoDB, and client-side AES-256 encryption.
 
-## 🚀 Live Demo
+##  Live Demo
 
 Check out the live application: [https://password-vault-hazel.vercel.app/](https://password-vault-hazel.vercel.app/)
 
 ## ✨ Features
 
 ### Core Features
-- 🔑 **Strong Password Generator**
+-  **Strong Password Generator**
   - Configurable length (8-32 characters)
   - Include/exclude numbers, symbols, look-alike characters
   - Cryptographically secure random generation
 
-- 🔒 **Secure Vault**
+-  **Secure Vault**
   - Client-side AES-256 encryption (server never sees plaintext)
   - Full CRUD operations (Create, Read, Update, Delete)
   - Store: title, username, password, URL, notes
 
-- 🔐 **Two-Factor Authentication (2FA)**
+-  **Two-Factor Authentication (2FA)**
   - TOTP-based 2FA using authenticator apps (Google Authenticator, Authy, etc.)
   - QR code setup for easy configuration
   - Enable/disable 2FA in settings
   - Secure verification during login
 
-- 🔍 **User Experience**
+-  **User Experience**
   - Real-time search and filter
   - Copy to clipboard with 15-second auto-clear
   - Clean, responsive UI with Tailwind CSS
   - Dark mode toggle
   - Fast and minimal design
 
-- 🛡️ **Security**
+-  **Security**
   - Passwords encrypted before leaving browser
   - JWT-based authentication with HTTP-only cookies
   - Secure session management
