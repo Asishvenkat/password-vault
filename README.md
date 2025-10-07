@@ -1,70 +1,80 @@
-/*
-# 🔐 Password Vault - Secure Password Manager
+Password Vault – Secure Password Manager (MVP)
 
-A modern, full-stack password manager built with Next.js 14, TypeScript, MongoDB, and client-side AES-256 encryption.
+Live Demo
+- Password Vault - Secure Password Manager
 
-## ✨ Features
+Overview
+A minimal, privacy-first password manager built with Next.js and TypeScript. It lets you generate strong passwords, encrypt them client-side, and store the ciphertext in MongoDB. The server never sees your plaintext secrets.
 
-### Core Features
-- 🔑 **Strong Password Generator**
-	- Configurable length (8-32 characters)
-	- Include/exclude numbers, symbols, look-alike characters
-	- Cryptographically secure random generation
-  
-- 🔒 **Secure Vault**
-	- Client-side AES-256 encryption (server never sees plaintext)
-	- Full CRUD operations (Create, Read, Update, Delete)
-	- Store: title, username, password, URL, notes
-  
-- 🔍 **User Experience**
-	- Real-time search and filter
-	- Copy to clipboard with 15-second auto-clear
-	- Clean, responsive UI with Tailwind CSS
-	- Fast and minimal design
+Key Features
+- Password generator: length slider, numbers/symbols toggles, exclude look-alikes.
+- Client-side encryption: AES-based encryption in the browser; server stores only ciphertext.
+- Vault CRUD: Add, view, edit, delete entries (title, username, password, URL, notes).
+- Search/filter: Basic search across saved entries.
+- Copy-to-clipboard with auto-clear (approx. 10–20s).
+- Simple auth: Email + password with bcrypt hashing and JWT (HTTP-only cookie).
+- Optional 2FA (TOTP): Speakeasy + QR setup with qrcode.
+- Dark mode: One-click theme toggle.
+- Export/Import: Encrypted export and import of your vault.
 
-- 🛡️ **Security**
-	- Passwords encrypted before leaving browser
-	- JWT-based authentication with HTTP-only cookies
-**Important**: 
-	# Password Vault - Secure Password Manager
+Tech Stack
+- Frontend: Next.js (App Router) + TypeScript + Tailwind CSS
+- Backend: Next.js API Routes
+- Database: MongoDB + Mongoose
+- Crypto: crypto-js (AES) for client-side encryption; Web Crypto API for secure random passwords
+- 2FA: speakeasy (TOTP), qrcode
 
-	A modern password manager built with Next.js 14, TypeScript, and MongoDB.
+How client-side encryption works
+- We use crypto-js AES to encrypt vault item fields in the browser.
+- Your login password is used as the client-side key (kept only in sessionStorage on the client). The server and database never see decrypted data.
+- Passwords are generated via the Web Crypto API (crypto.getRandomValues) for strong randomness.
 
-	This repository provides a starting point: client-side encryption helpers, API routes for auth and vault CRUD, and a simple UI.
+Project Structure (high level)
+- src/components: UI components (AuthForm, PasswordGenerator, VaultForm, VaultItem, ExportImport, DarkModeToggle)
+- src/app/api: API routes for auth, vault, and 2FA
+- src/lib: db connection, auth helpers (JWT/TOTP/QR), crypto helpers
+- src/models: Mongoose models (User, VaultItem)
 
-	## Quick start
+Environment Variables
+Create a .env.local file in the project root with:
+- MONGODB_URI=mongodb+srv://<user>:<pass>@<cluster>/<db>
+- JWT_SECRET=<a-strong-random-string>
 
-	1. Install dependencies:
+Run locally
+- Install dependencies
+  - npm install
+- Validate your environment
+  - npm run validate:env
+- Start the dev server
+  - npm run dev
+- Open http://localhost:3000
 
-	```bash
-	npm install
-	```
+Database helpers
+- Test DB connection: npm run test:db
+- Seed demo data: npm run seed
 
-	2. Create `.env.local` with:
+2FA notes
+- TOTP setup/verification is available via API routes and uses speakeasy.
+- Ensure the user model field totpSecret is used consistently in all 2FA endpoints (setup/verify/disable/login). If you previously used a different field name, re-setup 2FA after deploying this version.
 
-	```env
-	MONGODB_URI=your-mongodb-connection-string
-	JWT_SECRET=your-jwt-secret-at-least-32-chars
-	NEXT_PUBLIC_APP_URL=http://localhost:3000
-	```
+Security Notes
+- The server stores only ciphertext; decryption occurs solely in the browser.
+- HTTP-only cookie for JWT reduces XSS risk.
+- Copy-to-clipboard auto-clears after a short delay.
+- Do not log plaintext secrets. Avoid printing sensitive data to the console.
 
-	3. Run dev server:
+Assignment Coverage
+- Must-haves: Password generator, auth, encrypted vault CRUD, copy with auto-clear, basic search – implemented.
+- Nice-to-haves: 2FA, dark mode, export/import – implemented.
 
-	```bash
-	npm run dev
-	```
+Troubleshooting
+- 2FA codes rejected: check that your system/server time is accurate and that totpSecret is set for the account. If 2FA is enabled with no secret stored, log in and re-setup 2FA.
+- Cannot connect to DB: verify MONGODB_URI and network access to MongoDB Atlas/local instance.
+- Blank decryptions: ensure you’re logged in with the same password used to encrypt (the key lives in sessionStorage).
 
-	4. Run smoke-test (basic API check):
+License
+MIT
 
-	```bash
-	npm run smoke-test
-	```
-
-	## Smoke test
-
-	`scripts/api-smoke-test.js` performs a simple signup/login against the running dev server.
-
-	## Notes
-
-	- API implementations are basic and intended for development. Review security before production use.
-	- If you see DNS errors connecting to MongoDB Atlas, verify `MONGODB_URI` and that your machine/network can resolve SRV records.
+Credits
+- Founder: https://in.linkedin.com/in/setu-agrawal-1032681aa
+- Company: https://in.linkedin.com/company/web-development-company-top
