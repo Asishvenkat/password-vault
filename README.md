@@ -38,7 +38,38 @@ Check out the live application: [https://password-vault-hazel.vercel.app/](https
   - Secure session management
 
 ## Screenshots
-<table> <tr> <td align="center"> <a href="https://drive.google.com/file/d/1EBdT4cTp-jDOcaMPQcucIRpB4XulLAKL/view?usp=sharing" target="_blank"> <img src="https://drive.google.com/uc?export=view&id=1EBdT4cTp-jDOcaMPQcucIRpB4XulLAKL" width="450"/> </a> <br/> Add Password </td> <td align="center"> <a href="https://drive.google.com/file/d/1RwtFn2omvkdzb6mhZzWr07REqmTzu8i5/view?usp=sharing" target="_blank"> <img src="https://drive.google.com/uc?export=view&id=1RwtFn2omvkdzb6mhZzWr07REqmTzu8i5" width="450"/> </a> <br/>Enable @FA(OTOTP) </td> </tr> </table>
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://drive.google.com/file/d/1EBdT4cTp-jDOcaMPQcucIRpB4XulLAKL/view?usp=drive_link" target="_blank">
+        <img src="https://drive.google.com/uc?export=view&id=1EBdT4cTp-jDOcaMPQcucIRpB4XulLAKL" width="450"/>
+      </a>
+      <br/> Generate Password
+    </td>
+    <td align="center">
+      <a href="https://drive.google.com/file/d/1cPgfgkoAKJVC3iF_3CkVnHXkSBk2eBAG/view?usp=drive_link" target="_blank">
+        <img src="https://drive.google.com/uc?export=view&id=1cPgfgkoAKJVC3iF_3CkVnHXkSBk2eBAG" width="450"/>
+      </a>
+      <br/> View Passwords
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://drive.google.com/file/d/1EqhblR7Lxo4hjuV8WnKJ-8rjH6oVmze5/view?usp=drive_link" target="_blank">
+        <img src="https://drive.google.com/uc?export=view&id=1EqhblR7Lxo4hjuV8WnKJ-8rjH6oVmze5" width="450"/>
+      </a>
+      <br/> Add/Edit Password
+    </td>
+    <td align="center">
+      <a href="https://drive.google.com/file/d/1RwtFn2omvkdzb6mhZzWr07REqmTzu8i5/view?usp=drive_link" target="_blank">
+        <img src="https://drive.google.com/uc?export=view&id=1RwtFn2omvkdzb6mhZzWr07REqmTzu8i5" width="450"/>
+      </a>
+      <br/> Enable 2FA(TOTP)
+    </td>
+  </tr>
+</table>
+
 
 ## Quick Start
 
